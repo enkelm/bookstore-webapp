@@ -1,4 +1,4 @@
-﻿using API.DataAccess.Repository;
+﻿using API.DataAccess.Repository.IRepository;
 using API.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +8,9 @@ namespace WebAPI.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoriesController(UnitOfWork unitOfWork)
+        public CategoriesController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -34,8 +34,11 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCategory(int id, Category category)
         {
-            _unitOfWork.Category.Add(category);
-            return Ok(await _unitOfWork.SaveChangesAsync());
+            category.Id = id;
+            _unitOfWork.Category.Update(category);
+            await _unitOfWork.SaveChangesAsync();
+
+            return NoContent();
         }
 
         // POST: api/Categories
