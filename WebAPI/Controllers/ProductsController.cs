@@ -1,5 +1,7 @@
 ﻿using API.DataAccess.Repository.IRepository;
 using API.Models;
+using API.Models.DTOs;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -9,24 +11,48 @@ namespace WebAPI.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<ProductsController> _logger;
+        private readonly IMapper _mapper;
 
-        public ProductsController(IUnitOfWork unitOfWork)
+        public ProductsController(IUnitOfWork unitOfWork, ILogger<ProductsController> logger, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _logger = logger;
+            _mapper = mapper;
         }
 
         // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return Ok(await _unitOfWork.Product.GetAllAsync());
+            try
+            {
+                var categories = await _unitOfWork.Product.GetAllAsync();
+                var results = _mapper.Map<IList<ProductDTO>>(categories);
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(GetProducts)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProducts(int id)
+        public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            return Ok(await _unitOfWork.Product.GetByIdAsync(u => u.Id == id));
+            try
+            {
+                var category = await _unitOfWork.Product.GetByIdAsync(u => u.Id == id);
+                var result = _mapper.Map<ProductDTO>(category);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(GetProduct)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
         }
 
         // PUT: api/Products/5

@@ -1,5 +1,7 @@
 ﻿using API.DataAccess.Repository.IRepository;
 using API.Models;
+using API.Models.DTOs;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -9,24 +11,48 @@ namespace WebAPI.Controllers
     public class CoverTypesController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<CoverTypesController> _logger;
+        private readonly IMapper _mapper;
 
-        public CoverTypesController(IUnitOfWork unitOfWork)
+        public CoverTypesController(IUnitOfWork unitOfWork, ILogger<CoverTypesController> logger, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _logger = logger;
+            _mapper = mapper;
         }
 
         // GET: api/CoverTypes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CoverType>>> GetCoverTypes()
         {
-            return Ok(await _unitOfWork.CoverType.GetAllAsync());
+            try
+            {
+                var categories = await _unitOfWork.CoverType.GetAllAsync();
+                var results = _mapper.Map<IList<CoverTypeDTO>>(categories);
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(GetCoverTypes)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
         }
 
         // GET: api/CoverTypes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CoverType>> GetCoverType(int id)
         {
-            return Ok(await _unitOfWork.CoverType.GetByIdAsync(u => u.Id == id));
+            try
+            {
+                var category = await _unitOfWork.CoverType.GetByIdAsync(u => u.Id == id);
+                var result = _mapper.Map<CoverTypeDTO>(category);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(GetCoverType)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
         }
 
         // PUT: api/CoverTypes/5

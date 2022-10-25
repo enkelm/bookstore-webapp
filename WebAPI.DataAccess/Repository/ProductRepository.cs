@@ -1,6 +1,5 @@
 ﻿using API.DataAccess.Repository.IRepository;
 using API.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.DataAccess.Repository
 {
@@ -13,12 +12,11 @@ namespace API.DataAccess.Repository
             _db = db;
         }
 
-        public async void Update(Product obj)
+        public void Update(Product obj)
         {
             var objFromDb = _db.Products.FirstOrDefault(x => x.Id == obj.Id);
             if (objFromDb != null)
             {
-                var objFromDb = await _db.Products.FirstOrDefaultAsync(u => u.Id == obj.Id);
                 if (objFromDb != null)
                 {
                     objFromDb.Title = obj.Title;
@@ -39,3 +37,4 @@ namespace API.DataAccess.Repository
             }
         }
     }
+}
