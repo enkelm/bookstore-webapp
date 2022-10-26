@@ -2,7 +2,7 @@
 
 namespace API.Models.DTOs
 {
-    public class ProductDTO
+    public class CreateProductDTO
     {
 
         [Required]
@@ -42,7 +42,7 @@ namespace API.Models.DTOs
         public int CoverTypeId { get; set; }
     }
 
-    public class CreateProductDTO : ProductDTO
+    public class ProductDTO : CreateProductDTO
     {
         public int Id { get; set; }
         public CategoryDTO Category { get; set; }

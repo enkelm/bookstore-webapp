@@ -2,6 +2,7 @@
 using API.Models;
 using API.Models.DTOs;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -23,6 +24,9 @@ namespace WebAPI.Controllers
 
         // GET: api/CoverTypes
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<CoverType>>> GetCoverTypes()
         {
             try
@@ -40,6 +44,9 @@ namespace WebAPI.Controllers
 
         // GET: api/CoverTypes/5
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<CoverType>> GetCoverType(int id)
         {
             try
@@ -57,41 +64,101 @@ namespace WebAPI.Controllers
 
         // PUT: api/CoverTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCoverType(int id, CoverType covertype)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PutCoverType(int id, [FromBody] CreateCoverTypeDTO coverTypeDTO)
         {
-            covertype.Id = id;
-            _unitOfWork.CoverType.Update(covertype);
-            await _unitOfWork.SaveChangesAsync();
+            if (!ModelState.IsValid || id < 1)
+            {
+                _logger.LogError($"Invalid POST attempt in {nameof(PutCoverType)}");
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var coverType = await _unitOfWork.CoverType.GetByIdAsync(u => u.Id == id);
+                if (coverType == null)
+                {
+                    _logger.LogError($"Invalid POST attempt in {nameof(PutCoverType)}");
+                    return BadRequest("Submitted data is invalid.");
+                }
+                _mapper.Map(coverTypeDTO, coverType);
+                _unitOfWork.CoverType.Update(coverType);
+                await _unitOfWork.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(PutCoverType)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
         }
 
         // POST: api/CoverTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
-        public async Task<ActionResult<CoverType>> PostCoverType(CoverType covertype)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<CoverType>> PostCoverType([FromBody] CreateCoverTypeDTO coverTypeDTO)
         {
-            _unitOfWork.CoverType.Add(covertype);
-            await _unitOfWork.SaveChangesAsync();
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError($"Invalid POST attempt in {nameof(PostCoverType)}");
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var coverType = _mapper.Map<CoverType>(coverTypeDTO);
+                _unitOfWork.CoverType.Add(coverType);
+                await _unitOfWork.SaveChangesAsync();
 
-            return CreatedAtAction("GetCoverType", new { id = covertype.Id }, covertype);
+                return CreatedAtRoute("GetCategory", new { id = coverType.Id }, coverType);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(PostCoverType)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
         }
 
         // DELETE: api/CoverTypes/5
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteCoverTypes(int id)
         {
-            var covertype = await _unitOfWork.CoverType.GetByIdAsync(u => u.Id == id);
-            if (covertype == null)
+            if (id < 1)
             {
-                return NotFound();
+                _logger.LogError($"Invalid POST attempt in {nameof(DeleteCoverTypes)}");
+                return BadRequest(ModelState);
             }
+            try
+            {
+                var coverType = await _unitOfWork.CoverType.GetByIdAsync(u => u.Id == id);
 
-            _unitOfWork.CoverType.Remove(covertype);
-            await _unitOfWork.SaveChangesAsync();
+                if (coverType == null)
+                {
+                    _logger.LogError($"Invalid DELETE attempt in {nameof(DeleteCoverTypes)}");
+                    return BadRequest("Submitted data is invalid.");
+                }
 
-            return NoContent();
+                _unitOfWork.CoverType.Remove(coverType);
+                await _unitOfWork.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(DeleteCoverTypes)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
         }
     }
 }

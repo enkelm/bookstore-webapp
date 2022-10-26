@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace API.Models.DTOs
 {
-    public class CategoryDTO
+    public class CreateCategoryDTO
     {
         [Required]
         [StringLength(maximumLength: 100, ErrorMessage = "Category Name Is Too Long")]
@@ -16,7 +16,7 @@ namespace API.Models.DTOs
         public DateTime CreatedDateTime { get; set; } = DateTime.Now;
     }
 
-    public class CreateCategoryDTO : CategoryDTO
+    public class CategoryDTO : CreateCategoryDTO
     {
         public int Id { get; set; }
         public IList<ProductDTO> ProductDTOs { get; set; }

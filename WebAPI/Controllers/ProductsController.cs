@@ -2,6 +2,7 @@
 using API.Models;
 using API.Models.DTOs;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -23,6 +24,9 @@ namespace WebAPI.Controllers
 
         // GET: api/Products
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             try
@@ -40,6 +44,9 @@ namespace WebAPI.Controllers
 
         // GET: api/Products/5
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
             try
@@ -57,41 +64,101 @@ namespace WebAPI.Controllers
 
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PutProduct(int id, [FromBody] CreateProductDTO productDTO)
         {
-            product.Id = id;
-            _unitOfWork.Product.Update(product);
-            await _unitOfWork.SaveChangesAsync();
+            if (!ModelState.IsValid || id < 1)
+            {
+                _logger.LogError($"Invalid POST attempt in {nameof(PutProduct)}");
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var product = await _unitOfWork.Product.GetByIdAsync(u => u.Id == id);
+                if (product == null)
+                {
+                    _logger.LogError($"Invalid POST attempt in {nameof(PutProduct)}");
+                    return BadRequest("Submitted data is invalid.");
+                }
+                _mapper.Map(productDTO, product);
+                _unitOfWork.Product.Update(product);
+                await _unitOfWork.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(PutProduct)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
         }
 
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Product>> PostProduct([FromBody] CreateProductDTO productDTO)
         {
-            _unitOfWork.Product.Add(product);
-            await _unitOfWork.SaveChangesAsync();
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError($"Invalid POST attempt in {nameof(PostProduct)}");
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var product = _mapper.Map<Product>(productDTO);
+                _unitOfWork.Product.Add(product);
+                await _unitOfWork.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+                return CreatedAtRoute("GetCategory", new { id = product.Id }, product);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(PostProduct)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
         }
 
         // DELETE: api/Products/5
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteProducts(int id)
         {
-            var product = await _unitOfWork.Product.GetByIdAsync(u => u.Id == id);
-            if (product == null)
+            if (id < 1)
             {
-                return NotFound();
+                _logger.LogError($"Invalid POST attempt in {nameof(DeleteProducts)}");
+                return BadRequest(ModelState);
             }
+            try
+            {
+                var product = await _unitOfWork.Product.GetByIdAsync(u => u.Id == id);
 
-            _unitOfWork.Product.Remove(product);
-            await _unitOfWork.SaveChangesAsync();
+                if (product == null)
+                {
+                    _logger.LogError($"Invalid DELETE attempt in {nameof(DeleteProducts)}");
+                    return BadRequest("Submitted data is invalid.");
+                }
 
-            return NoContent();
+                _unitOfWork.Product.Remove(product);
+                await _unitOfWork.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(DeleteProducts)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
         }
     }
 }
