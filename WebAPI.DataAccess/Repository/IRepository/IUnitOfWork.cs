@@ -5,6 +5,7 @@
         ICategoryRepository Category { get; }
         ICoverTypeRepository CoverType { get; }
         IProductRepository Product { get; }
+        IShoppingCartRepository ShoppingCart { get; }
 
         Task<bool> SaveChangesAsync();
     }

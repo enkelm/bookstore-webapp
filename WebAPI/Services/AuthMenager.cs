@@ -1,10 +1,10 @@
-﻿using API.Models;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using API.Models;
 using API.Models.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace WebAPI.Services
 {
@@ -34,9 +34,11 @@ namespace WebAPI.Services
             var jwtSettings = _configuration.GetSection("Jwt");
             var expiration = DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings.GetSection("lifetime").Value));
             var token = new JwtSecurityToken(
-                issuer: jwtSettings.GetSection("validIssuer").Value,
+                //issuer: jwtSettings.GetSection("validIssuer").Value,
+                issuer: "WebAPI",
                 claims: claims,
                 expires: expiration,
+                audience: "WebAPI",
                 signingCredentials: signingCredentials
                 );
             return token;

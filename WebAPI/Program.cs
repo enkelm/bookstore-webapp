@@ -1,3 +1,4 @@
+using System.Text;
 using API.DataAccess;
 using API.DataAccess.Repository;
 using API.DataAccess.Repository.IRepository;
@@ -9,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System.Text;
 using WebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,6 +60,7 @@ builder.Services.AddSwaggerGen(c =>
 
 //Config Mapper
 builder.Services.AddAutoMapper(typeof(MapperInitilizer));
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")//
@@ -87,14 +88,18 @@ builder.Services.AddAuthentication(o =>
     {
         o.TokenValidationParameters = new TokenValidationParameters
         {
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
             ValidateIssuer = true,
+            ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings.GetSection("Issuer").Value,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
         };
     });
 builder.Services.AddScoped<IAuthMenager, AuthMenager>();
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

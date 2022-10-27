@@ -10,6 +10,7 @@ namespace API.Models.Configurations
             CreateMap<Category, CategoryDTO>().ReverseMap();
             CreateMap<CoverType, CoverTypeDTO>().ReverseMap();
             CreateMap<Product, ProductDTO>().ReverseMap();
+            CreateMap<ShoppingCart, ShoppingCartDTO>().ReverseMap();
             CreateMap<ApiUser, ApiUserDTO>().ReverseMap();
         }
     }
