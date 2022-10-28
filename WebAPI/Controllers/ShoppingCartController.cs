@@ -101,7 +101,7 @@ namespace WebAPI.Controllers
         // POST: api/ShoppingCart
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Roles = "Administrator", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("PostShoppingCart")]
+        [HttpPost("PostShoppingCart", Name = "PostShoppingCart")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -118,7 +118,7 @@ namespace WebAPI.Controllers
                 _unitOfWork.ShoppingCart.Add(shoppingCart);
                 await _unitOfWork.SaveChangesAsync();
 
-                return CreatedAtRoute("GetCategory", new { id = shoppingCart.Id }, shoppingCart);
+                return CreatedAtRoute("PostShoppingCart", new { id = shoppingCart.Id }, shoppingCart);
             }
             catch (Exception ex)
             {

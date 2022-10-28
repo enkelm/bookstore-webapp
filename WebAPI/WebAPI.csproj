@@ -25,4 +25,8 @@
     <ProjectReference Include="..\WebAPI.DataAccess\API.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Images\" />
+  </ItemGroup>
+
 </Project>

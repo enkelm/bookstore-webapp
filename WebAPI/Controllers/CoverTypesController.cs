@@ -101,7 +101,7 @@ namespace WebAPI.Controllers
         // POST: api/CoverTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Roles = "Administrator", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("PostCoverType")]
+        [HttpPost("PostCoverType", Name = "PostCoverType")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -118,7 +118,7 @@ namespace WebAPI.Controllers
                 _unitOfWork.CoverType.Add(coverType);
                 await _unitOfWork.SaveChangesAsync();
 
-                return CreatedAtRoute("GetCategory", new { id = coverType.Id }, coverType);
+                return CreatedAtRoute("PostCoverType", new { id = coverType.Id }, coverType);
             }
             catch (Exception ex)
             {

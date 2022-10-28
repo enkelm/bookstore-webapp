@@ -60,7 +60,6 @@ builder.Services.AddSwaggerGen(c =>
 
 //Config Mapper
 builder.Services.AddAutoMapper(typeof(MapperInitilizer));
-builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")//

@@ -15,12 +15,14 @@ namespace WebAPI.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<ProductsController> _logger;
         private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _appEnvironment;
 
-        public ProductsController(IUnitOfWork unitOfWork, ILogger<ProductsController> logger, IMapper mapper)
+        public ProductsController(IUnitOfWork unitOfWork, ILogger<ProductsController> logger, IMapper mapper, IWebHostEnvironment appEnvironment)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
+            _appEnvironment = appEnvironment;
         }
 
         // GET: api/Products
@@ -101,7 +103,7 @@ namespace WebAPI.Controllers
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Roles = "Administrator", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("PostProduct")]
+        [HttpPost("PostProduct", Name = "PostProdut")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -118,7 +120,7 @@ namespace WebAPI.Controllers
                 _unitOfWork.Product.Add(product);
                 await _unitOfWork.SaveChangesAsync();
 
-                return CreatedAtRoute("GetCategory", new { id = product.Id }, product);
+                return CreatedAtRoute("PostProdut", new { id = product.Id }, product);
             }
             catch (Exception ex)
             {
