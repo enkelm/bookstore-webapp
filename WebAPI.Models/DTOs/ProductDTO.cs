@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Models.DTOs
 {
@@ -33,7 +34,9 @@ namespace API.Models.DTOs
         [Range(1, 1000)]
         public double Price100 { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
+
+        public IFormFile Image { get; set; }
 
         [Required]
         public int CategoryId { get; set; }

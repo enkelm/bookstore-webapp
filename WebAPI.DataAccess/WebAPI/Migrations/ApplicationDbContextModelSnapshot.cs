@@ -162,7 +162,6 @@ namespace WebAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("ListPrice")
@@ -248,15 +247,15 @@ namespace WebAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0bdfa195-493b-49ce-90eb-8ad786260448",
-                            ConcurrencyStamp = "b8bfa100-ac1d-4648-9f0b-6623730871e0",
+                            Id = "d37bfe37-1f8f-443d-aa04-2e44ec1d6615",
+                            ConcurrencyStamp = "2da0f94d-cdc0-453e-a4b4-c0ffebc9ece0",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "3fab9e2f-1ac8-4d03-82bb-c14ca8c58a26",
-                            ConcurrencyStamp = "56f0854b-e984-4f87-9fce-649e496fa0ed",
+                            Id = "827503f7-02f3-477f-a059-1cedad1922ef",
+                            ConcurrencyStamp = "ee9e1f3d-48ca-40bc-ad9c-0f339d840bc3",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });

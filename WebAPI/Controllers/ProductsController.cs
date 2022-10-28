@@ -72,7 +72,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutProduct(int id, [FromBody] CreateProductDTO productDTO)
+        public async Task<IActionResult> PutProduct(int id, [FromForm] CreateProductDTO productDTO)
         {
             if (!ModelState.IsValid || id < 1)
             {
@@ -87,6 +87,7 @@ namespace WebAPI.Controllers
                     _logger.LogError($"Invalid POST attempt in {nameof(PutProduct)}");
                     return BadRequest("Submitted data is invalid.");
                 }
+                await UpdateImage(productDTO.Image, product.ImageUrl);
                 _mapper.Map(productDTO, product);
                 _unitOfWork.Product.Update(product);
                 await _unitOfWork.SaveChangesAsync();
@@ -99,6 +100,14 @@ namespace WebAPI.Controllers
                 return StatusCode(500, "Internal Server Error. Please Try Again Later.");
             }
         }
+        private async Task<IActionResult> UpdateImage(IFormFile file, string path)
+        {
+            using (FileStream stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+            return Ok();
+        }
 
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -107,7 +116,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Product>> PostProduct([FromBody] CreateProductDTO productDTO)
+        public async Task<ActionResult<Product>> PostProduct([FromForm] CreateProductDTO productDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -116,6 +125,8 @@ namespace WebAPI.Controllers
             }
             try
             {
+                string path = await UploadImage(productDTO.Image);
+                productDTO.ImageUrl = path;
                 var product = _mapper.Map<Product>(productDTO);
                 _unitOfWork.Product.Add(product);
                 await _unitOfWork.SaveChangesAsync();
@@ -127,6 +138,20 @@ namespace WebAPI.Controllers
                 _logger.LogError(ex, $"Something Went Wrong in the {nameof(PostProduct)}");
                 return StatusCode(500, "Internal Server Error. Please Try Again Later.");
             }
+        }
+
+        private async Task<string> UploadImage(IFormFile file)
+        {
+            var special = Guid.NewGuid().ToString();
+            var folderpath = _appEnvironment.WebRootPath + "\\Uploads\\ProductImages";
+            var filename = special + "-" + file.FileName;
+
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), folderpath, filename);
+            using (FileStream stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+            return filePath;
         }
 
         // DELETE: api/Products/5

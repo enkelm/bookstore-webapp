@@ -1,4 +1,7 @@
-﻿namespace API.Models
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace API.Models
 {
     public class Product
     {
@@ -20,7 +23,9 @@
 
         public double Price100 { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
+        [NotMapped]
+        public IFormFile Image { get; set; }
 
         public int CategoryId { get; set; }
         public Category Category { get; set; }
