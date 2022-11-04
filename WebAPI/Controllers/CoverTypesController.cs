@@ -4,6 +4,7 @@ using API.Models.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -24,7 +25,8 @@ namespace WebAPI.Controllers
         }
 
         // GET: api/CoverTypes
-        [HttpGet("GetCoverTypes")]
+        [EnableCors]
+        [HttpGet("GetAll")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -44,7 +46,8 @@ namespace WebAPI.Controllers
         }
 
         // GET: api/CoverTypes/5
-        [HttpGet("GetCoverType/{id}")]
+        [EnableCors]
+        [HttpGet("GetById/{id}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -65,8 +68,9 @@ namespace WebAPI.Controllers
 
         // PUT: api/CoverTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [EnableCors]
         [Authorize(Roles = "Administrator", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPut("PutCoverType/{id}")]
+        [HttpPut("Put/{id}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -100,8 +104,9 @@ namespace WebAPI.Controllers
 
         // POST: api/CoverTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [EnableCors]
         [Authorize(Roles = "Administrator", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("PostCoverType", Name = "PostCoverType")]
+        [HttpPost("Post", Name = "PostCoverType")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -128,8 +133,9 @@ namespace WebAPI.Controllers
         }
 
         // DELETE: api/CoverTypes/5
+        [EnableCors]
         [Authorize(Roles = "Administrator", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpDelete("DeleteCoverType/{id}")]
+        [HttpDelete("Delete/{id}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
