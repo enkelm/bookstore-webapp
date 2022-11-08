@@ -156,7 +156,7 @@ namespace WebAPI.Controllers
             {
                 await file.CopyToAsync(stream);
             }
-            return filePath;
+            return Path.Combine("https://localhost:44384/images", filename);
         }
 
         // DELETE: api/Products/5
