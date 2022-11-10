@@ -91,7 +91,10 @@ namespace WebAPI.Controllers
                     _logger.LogError($"Invalid POST attempt in {nameof(PutProduct)}");
                     return BadRequest("Submitted data is invalid.");
                 }
-                await UpdateImage(productDTO.Image, product.ImageUrl);
+                var folderpath = _appEnvironment.WebRootPath + "\\Uploads\\ProductImages";
+                var imagename = product.ImageUrl.Replace("https://localhost:44384/images", "").Remove(0, 1);
+                var path = Path.Combine(folderpath, imagename);
+                await UpdateImage(productDTO.Image, path);
                 _mapper.Map(productDTO, product);
                 _unitOfWork.Product.Update(product);
                 await _unitOfWork.SaveChangesAsync();
@@ -106,11 +109,18 @@ namespace WebAPI.Controllers
         }
         private async Task<IActionResult> UpdateImage(IFormFile file, string path)
         {
-            using (FileStream stream = new FileStream(path, FileMode.Create))
+            if (file == null || path == null)
             {
-                await file.CopyToAsync(stream);
+                return Ok();
             }
-            return Ok();
+            else
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                return Ok();
+            }
         }
 
         // POST: api/Products
