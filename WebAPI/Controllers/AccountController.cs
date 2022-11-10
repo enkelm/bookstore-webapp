@@ -86,7 +86,7 @@ namespace WebAPI.Controllers
 
                 var user = await _userManager.FindByEmailAsync(userDTO.Email);
 
-                return Accepted(new { Token = await _authMenager.CreateToken(), Role = await _userManager.GetRolesAsync(user) });
+                return Accepted(new { Token = await _authMenager.CreateToken(), Role = await _userManager.GetRolesAsync(user), UserId = await _userManager.GetUserIdAsync(user) });
             }
             catch (Exception ex)
             {
