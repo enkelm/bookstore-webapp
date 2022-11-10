@@ -9,7 +9,7 @@
 
         public int Count { get; set; }
 
-        public int ApplicationUserId { get; set; }
+        public string ApplicationUserId { get; set; }
         public ApiUser ApiUser { get; set; }
     }
 }

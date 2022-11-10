@@ -9,7 +9,7 @@ namespace API.Models.DTOs
         [Range(1, 1000, ErrorMessage = "Please enter a value between 1 and 1000")]
         public int Count { get; set; }
 
-        public int ApplicationUserId { get; set; }
+        public string ApplicationUserId { get; set; }
 
     }
     public class ShoppingCartDTO : CreateShoppingCartDTO
