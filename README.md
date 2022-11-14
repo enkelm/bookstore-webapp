@@ -21,4 +21,5 @@ This value will be used by JWT for encryption purposes
   <li>ASP Identity with custom roles</li>
   <li>JWT authentication</li>
   <li>Simple Cors implementation</li>
+  <li>Static file serving</li>
 </ul>
