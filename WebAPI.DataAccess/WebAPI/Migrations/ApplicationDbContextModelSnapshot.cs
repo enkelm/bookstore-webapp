@@ -200,8 +200,9 @@ namespace WebAPI.Migrations
                     b.Property<string>("ApiUserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ApplicationUserId")
-                        .HasColumnType("int");
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Count")
                         .HasColumnType("int");
@@ -247,15 +248,22 @@ namespace WebAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "d37bfe37-1f8f-443d-aa04-2e44ec1d6615",
-                            ConcurrencyStamp = "2da0f94d-cdc0-453e-a4b4-c0ffebc9ece0",
+                            Id = "18199e20-df1e-4a23-9b61-edc64201484d",
+                            ConcurrencyStamp = "c427eaaa-4bdd-4202-baa4-aae9ca8315e5",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "827503f7-02f3-477f-a059-1cedad1922ef",
-                            ConcurrencyStamp = "ee9e1f3d-48ca-40bc-ad9c-0f339d840bc3",
+                            Id = "8043e2ea-0c27-4df8-a6de-c96444b66077",
+                            ConcurrencyStamp = "ba9fd3a5-d8bd-475a-b267-dfc77e340266",
+                            Name = "Editor",
+                            NormalizedName = "EDITOR"
+                        },
+                        new
+                        {
+                            Id = "46c14f57-9490-44c1-ac28-75d66543c44c",
+                            ConcurrencyStamp = "d67c821b-8366-4400-ad63-a2619bdff9fd",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
