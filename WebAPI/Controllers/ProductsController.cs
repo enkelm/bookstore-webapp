@@ -193,6 +193,11 @@ namespace WebAPI.Controllers
                     return BadRequest("Submitted data is invalid.");
                 }
 
+                var folderpath = _appEnvironment.WebRootPath + "\\Uploads\\ProductImages";
+                var imagename = product.ImageUrl.Replace("https://localhost:44384/images", "").Remove(0, 1);
+                var path = Path.Combine(folderpath, imagename);
+                System.IO.File.Delete(path);
+
                 _unitOfWork.Product.Remove(product);
                 await _unitOfWork.SaveChangesAsync();
 

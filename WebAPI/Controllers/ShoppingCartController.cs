@@ -2,9 +2,8 @@
 using API.Models;
 using API.Models.DTOs;
 using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -14,12 +13,14 @@ namespace WebAPI.Controllers
     public class ShoppingCartController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<ApiUser> _userManager;
         private readonly ILogger<ShoppingCartController> _logger;
         private readonly IMapper _mapper;
 
-        public ShoppingCartController(IUnitOfWork unitOfWork, ILogger<ShoppingCartController> logger, IMapper mapper)
+        public ShoppingCartController(IUnitOfWork unitOfWork, UserManager<ApiUser> userMenager, ILogger<ShoppingCartController> logger, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _userManager = userMenager;
             _logger = logger;
             _mapper = mapper;
         }
@@ -66,10 +67,30 @@ namespace WebAPI.Controllers
             }
         }
 
+        //GET: api/ShoppingCart/GetByUser
+        [EnableCors]
+        [HttpGet("GetByUser/{userId}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ShoppingCart>> GetShoppingCartByUser(string userId)
+        {
+            try
+            {
+                var cartHistory = await _unitOfWork.ShoppingCart.GetByUser(userId);
+                var result = _mapper.Map<IList<ShoppingCartDTO>>(cartHistory);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something Went Wrong in the {nameof(GetShoppingCartByUser)}");
+                return StatusCode(500, "Internal Server Error. Please Try Again Later.");
+            }
+        }
+
         // PUT: api/ShoppingCart/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [EnableCors]
-        [Authorize(Roles = "Administrator", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut("Put/{id}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -105,7 +126,6 @@ namespace WebAPI.Controllers
         // POST: api/ShoppingCart
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [EnableCors]
-        [Authorize(Roles = "Administrator", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("Post", Name = "PostShoppingCart")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -134,7 +154,6 @@ namespace WebAPI.Controllers
 
         // DELETE: api/ShoppingCart/5
         [EnableCors]
-        [Authorize(Roles = "Administrator", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("Delete/{id}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -34,12 +34,11 @@ namespace WebAPI.Controllers
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] ApiUserDTO userDTO)
         {
-            _logger.LogInformation($"Registration Attempt for {userDTO.Email}");
             if (!ModelState.IsValid)
             {
+                _logger.LogInformation($"Registration Attempt for {userDTO.Email}");
                 return BadRequest(ModelState);
             }
-
             try
             {
                 var user = _mapper.Map<ApiUser>(userDTO);
@@ -71,9 +70,9 @@ namespace WebAPI.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginUserDTO userDTO)
         {
-            _logger.LogInformation($"Login Attempt for {userDTO.Email}");
             if (!ModelState.IsValid)
             {
+                _logger.LogInformation($"Login Attempt for {userDTO.Email}");
                 return BadRequest(ModelState);
             }
 

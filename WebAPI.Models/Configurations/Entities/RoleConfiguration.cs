@@ -16,6 +16,11 @@ namespace API.Models.Configurations.Entities
                 },
                  new IdentityRole
                  {
+                     Name = "Editor",
+                     NormalizedName = "EDITOR"
+                 },
+                 new IdentityRole
+                 {
                      Name = "Administrator",
                      NormalizedName = "ADMINISTRATOR"
                  }
